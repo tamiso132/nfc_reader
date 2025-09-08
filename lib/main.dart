@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:nfc_manager/nfc_manager.dart';
+import 'package:nfc_manager/nfc_manager_android.dart';
 
 void main() {
+ // WidgetsFlutterBinding.ensureInitialized();
   runApp(MyApp());
 }
 
@@ -21,20 +23,46 @@ class NfcExample extends StatefulWidget {
   NfcExampleState createState() => NfcExampleState();
 }
 
+enum NfcState{
+  startNFC("Start NFC Scan"),
+  closeNFC("Stop NFC Scan");
+
+  final String label;
+  const NfcState(this.label);
+}
+
 class NfcExampleState extends State<NfcExample> {
-  String _tagData = "Scan an NFC tag";
 
-  void _startNfcSession() {
+  NfcState _nfcState = NfcState.startNFC;
 
-     NfcManager.instance.startSession(
+
+  void _startNfcSession() async{
+    print("Start Session");
+    await NfcManager.instance.startSession(
       pollingOptions: {NfcPollingOption.iso14443},
-      onDiscovered: (tag) {
+      onDiscovered: (tag) async{
         print(tag.data);
+        NfcAAndroid? nfc = NfcAAndroid.from(tag); // passport protocol
+        if(nfc!= null) {
+          //TODO Begin handshake protocol
+         // var response = await nfc.transceive();
+
+        }
+
+        await NfcManager.instance.stopSession();
       },
       alertMessageIos: "Hold your device near the NFC tag",
     );
 
   }
+
+  void _stopNfcSession() async{
+    NfcManager.instance.stopSession();
+
+
+  }
+
+
 
   @override
   Widget build(BuildContext context) {
@@ -44,11 +72,23 @@ class NfcExampleState extends State<NfcExample> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Text(_tagData),
             SizedBox(height: 20),
             ElevatedButton(
-              onPressed: _startNfcSession,
-              child: Text("Start NFC Scan"),
+              onPressed: () async {
+                setState(() {
+                  switch(_nfcState){
+                    case NfcState.startNFC:
+                      _startNfcSession();
+                      _nfcState = NfcState.closeNFC;
+                      break;
+                    case NfcState.closeNFC:
+                      _stopNfcSession();
+                      _nfcState = NfcState.startNFC;
+                      break;
+                  }
+                });
+              },
+              child: Text(_nfcState.label),
             ),
           ],
         ),
