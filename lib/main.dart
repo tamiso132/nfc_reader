@@ -30,6 +30,7 @@ class NfcExample extends StatefulWidget {
 enum NfcState{
   startNFC("Start NFC Scan"),
   closeNFC("Stop NFC Scan");
+  //hhtchtch
 
   final String label;
   const NfcState(this.label);
@@ -79,6 +80,7 @@ class NfcExampleState extends State<NfcExample> {
           break;
       }
       // rebuild ui
+      //Testter
       setState(() {
       });
   }
