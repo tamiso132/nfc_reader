@@ -1,12 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:nfc_manager/nfc_manager.dart';
 import 'package:nfc_manager/nfc_manager_android.dart';
-import 'package:mrzscanner_flutter/mrzscanner_flutter.dart';
+import 'package:test_flutter/Doc9303/apdu.dart';
 
 void main() {
  // WidgetsFlutterBinding.ensureInitialized();
   runApp(MyApp());
 }
+
 
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
@@ -43,19 +44,30 @@ class NfcExampleState extends State<NfcExample> {
 
   void _startNfcSession() async{
     print("Start Session");
+
     //Mrzflutterplugin.startContinuousScanner(testCallback);
-    /*
+
     await NfcManager.instance.startSession(
       pollingOptions: {NfcPollingOption.iso14443},
       onDiscovered: (tag) async{
        print("Discovered");
         print(tag.data);
-        NfcAAndroid? nfc = NfcAAndroid.from(tag); // passport protocol
+       IsoDepAndroid? nfc = IsoDepAndroid.from(tag); // passport protocol
 
         if(nfc!= null) {
-          print("NfcA protocol");
-          nfc.transceive(10);
+
+          ResponseCommand response=   await Command.readBinaryGlobal(nfc, EfIdGlobal.cardAccess, 0, 0);
+          print("resp: 0x${toHex(response.sw1)}${toHex(response.sw2)}");
+          response= await Command.selectLDS1Application(nfc);
+          print("resp: 0x${toHex(response.sw1)}${toHex(response.sw2)}");
+
+          response = await Command.readBinaryApp(nfc, EfIdAppSpecific.dg1, 0x00, 255);
+
+         print("resp: 0x${toHex(response.sw1)}${toHex(response.sw2)}");
+
+
          // var response = await nfc.transceive();
+          NfcManager.instance.stopSession();
 
         }
         else{
@@ -66,7 +78,7 @@ class NfcExampleState extends State<NfcExample> {
       },
       alertMessageIos: "Hold your device near the NFC tag",
     );
-    */
+
   }
 
   void _stopNfcSession() async{

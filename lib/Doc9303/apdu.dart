@@ -1,17 +1,37 @@
 // Base interface for requests: must provide bytes to send
-import 'dart:js_interop';
 import 'dart:typed_data';
 
 import 'package:nfc_manager/nfc_manager_android.dart';
 
-enum CommandParameter{
-  cla,
-  ins,
-  pi,
-  p2,
-  lc,
-  data,
-  le,
+String toHex(int value, {int width = 2}) {
+  return "${value.toRadixString(16).toUpperCase().padLeft(width, '0')}";
+}
+
+/*
+Id for files that are not application specific
+*/
+
+enum SwStatus{
+  success(0x9000),
+  fileNotFound(0x6A82),
+  recordNotFound(0x6A83),
+  wrongRespLen(0x6700),
+  securityNotSatisfied(0x6982),
+  commandNotAllowed(0x6986),
+  commandAborted(0x6F00),
+  cardDead(0x6FFF),
+  incorrectParameter(0x6a86);
+
+
+  final int value;
+  const SwStatus(this.value);
+
+  factory SwStatus.fromInt(int code) {
+    return SwStatus.values.firstWhere(
+          (s) => s.value == code,
+      orElse: () => throw Exception('Unknown SW code: 0x${toHex(code)}'),
+    );
+  }
 }
 
 enum EfIdGlobal {
@@ -20,11 +40,14 @@ enum EfIdGlobal {
   atrInfo(0x01),
   dir(0x1E);
 
-
   final int value;
   const EfIdGlobal(this.value);
 }
 
+
+/*
+Id for files that are for LDS1 application
+*/
 enum EfIdAppSpecific{
   com(0x1E),
   dg1(0x01),
@@ -37,9 +60,15 @@ enum EfIdAppSpecific{
   const EfIdAppSpecific(this.value);
 }
 
+
+/*
+Response Structure
+*/
 class ResponseCommand{
 
-  ResponseCommand(this.sw1, this.sw2, {this.data});
+  ResponseCommand(this.sw1, this.sw2, {this.data}){
+    print("resp: 0x${toHex(sw1)}${toHex(sw2)}");
+  }
 
   int sw1 = 0;
   int sw2 = 0;
@@ -47,10 +76,10 @@ class ResponseCommand{
 }
 
 
-
+/*
+Structure for Asn package,  TAG->length->data
+*/
 class AsnPackage{
-
-
   AsnPackage(this.tag, this.data);
 
   static List<AsnPackage> parse(Uint8List data){
@@ -107,13 +136,29 @@ class CommandPackage{
 
 class Command{
 
-  static Future<ResponseCommand> readBinary(IsoDepAndroid isoDep, int efID, int offset, int le, {int cla = 0x00}) async{
-    Uint8List bytes = CommandPackage(cla, 0xB0, efID, offset, le: le).toBytes();
+  static Future<ResponseCommand> readBinaryGlobal(IsoDepAndroid isoDep, EfIdGlobal efID, int offset, int le, {int cla = 0x00}) async{
+    Uint8List bytes = CommandPackage(cla, 0xB0, efID.value, offset, le: le).toBytes();
    final responseBytes =  await isoDep.transceive(bytes);
 
     if (responseBytes.length > 2) {
       final data = responseBytes.sublist(2); // bytes from index 2 to end
-      return ResponseCommand(responseBytes[0], responseBytes[1], data: data);
+      return ResponseCommand(responseBytes.length - 2, responseBytes.length - 1, data: data);
+    } else if(responseBytes.length == 2) {
+      return ResponseCommand(responseBytes[0], responseBytes[1]);
+    }
+    else{
+      throw ArgumentError("no response was recieved");
+    }
+
+  }
+
+  static Future<ResponseCommand> readBinaryApp(IsoDepAndroid isoDep, EfIdAppSpecific efID, int offset, int le, {int cla = 0x00}) async{
+    Uint8List bytes = CommandPackage(cla, 0xB0, efID.value, offset, le: le).toBytes();
+    final responseBytes =  await isoDep.transceive(bytes);
+
+    if (responseBytes.length > 2) {
+      final data = responseBytes.sublist(2); // bytes from index 2 to end
+      return ResponseCommand(responseBytes.length - 2, responseBytes.length - 1, data: data);
     } else if(responseBytes.length == 2) {
       return ResponseCommand(responseBytes[0], responseBytes[1]);
     }
@@ -150,10 +195,13 @@ class Command{
     if (response.length != 2) {
       throw ArgumentError("Invalid response\nresponse length: ${response.length}");
     }
-
+    mIsActiveApp = true;
     return ResponseCommand(response[0], response[1]);
 
   }
+
+  // if we selected an application
+  static bool mIsActiveApp = false;
 
 
 }
