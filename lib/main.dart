@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:nfc_manager/nfc_manager.dart';
 import 'package:nfc_manager/nfc_manager_android.dart';
+import 'package:mrzscanner_flutter/mrzscanner_flutter.dart';
 
 void main() {
  // WidgetsFlutterBinding.ensureInitialized();
@@ -31,6 +32,10 @@ enum NfcState{
   const NfcState(this.label);
 }
 
+void testCallback(String result){
+  print(result);
+}
+
 class NfcExampleState extends State<NfcExample> {
 
   NfcState _nfcState = NfcState.startNFC;
@@ -38,22 +43,30 @@ class NfcExampleState extends State<NfcExample> {
 
   void _startNfcSession() async{
     print("Start Session");
+    //Mrzflutterplugin.startContinuousScanner(testCallback);
+    /*
     await NfcManager.instance.startSession(
       pollingOptions: {NfcPollingOption.iso14443},
       onDiscovered: (tag) async{
+       print("Discovered");
         print(tag.data);
         NfcAAndroid? nfc = NfcAAndroid.from(tag); // passport protocol
+
         if(nfc!= null) {
-          //TODO Begin handshake protocol
+          print("NfcA protocol");
+          nfc.transceive(10);
          // var response = await nfc.transceive();
 
+        }
+        else{
+          print("not that?");
         }
 
         await NfcManager.instance.stopSession();
       },
       alertMessageIos: "Hold your device near the NFC tag",
     );
-
+    */
   }
 
   void _stopNfcSession() async{
