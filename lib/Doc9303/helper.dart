@@ -6,11 +6,32 @@ void printUint8List(Uint8List bytes) {
   print(hexString);
 }
 
+String decodeOid(Uint8List bytes) {
+  if (bytes.isEmpty) return '';
+
+  final buffer = StringBuffer();
+  int first = bytes[0] ~/ 40;
+  int second = bytes[0] % 40;
+  buffer.write('$first.$second');
+
+  int value = 0;
+  for (int i = 1; i < bytes.length; i++) {
+    int b = bytes[i];
+    value = (value << 7) | (b & 0x7F);
+    if ((b & 0x80) == 0) { // end of subidentifier
+      buffer.write('.$value');
+      value = 0;
+    }
+  }
+
+  return buffer.toString();
+}
+
 // TODO, write tests
 class AsnInfo{
   AsnInfo(this.tag, this.data);
 
-  int tag;
+  TagID tag;
   Uint8List data;
 }
 
@@ -60,7 +81,7 @@ class ByteReader{
   }
 
   AsnInfo readASN1(){
-    int tag = readInt(1);
+    TagID tag = TagID.fromInt(readInt(1));
     int len = readLength();
     Uint8List data = readBytes(len);
 

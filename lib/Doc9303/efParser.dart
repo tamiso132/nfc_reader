@@ -26,6 +26,11 @@ TODO: EF.SOD (V1), Two versions EF.SOD V0 or EF.SOD V1. V1 Recomended ONLY USE 1
  */
 
 
+/*
+Tree like structure
+ */
+
+
 //EF.DG1:
 
 class Dg1Info{
@@ -313,48 +318,19 @@ class ImplCardAccess implements _IEfParser<CardAccessInfo>{
     CardAccessInfo ef = CardAccessInfo();
     ByteReader reader = ByteReader(bytes);
 
-    AsnInfo outerAsn = reader.readASN1();
+  //  AsnInfo outerAsn = reader.readASN1();
 
    // if (outerAsn.tag != 0x1C) {
     //  throw Exception("Not a valid EF.CardAccess file, expected tag 0x1C but I get 0x${toHex(outerAsn.tag)}");
    // }
 
-    int length = outerAsn.data.length;
-    reader = ByteReader(outerAsn.data);
+    reader = ByteReader(bytes);
 
-    while (reader.hasRemaining()) {
-     AsnInfo readASN = reader.readASN1();
-     print("tag: ${readASN.tag}");
+  List<AsnNode> nodes =  AsnNode.parse(reader);
+  for(AsnNode node in nodes){
+    node.printTree();
+  }
 
-      switch (readASN.tag) {
-        case 0x30: // PaceInfo
-
-          ByteReader innerReader = ByteReader(readASN.data);
-          while(innerReader.hasRemaining()){
-            AsnInfo innerAsn = innerReader.readASN1();
-            int count = 0;
-            switch(innerAsn.tag){
-              case 0xA: // identifier
-                ef.protocol = innerReader.readString(innerAsn.data.length);
-                break;
-              default: //
-                if(count == 0){
-                  ef.version = innerReader.readInt(1);
-                  count+= 1;
-                }
-                else{
-                  ef.parameterID = innerReader.readInt(1);
-                }
-                break;
-            }
-          }
-
-
-
-
-          break;
-      }
-    }
 
     return ef;
   }

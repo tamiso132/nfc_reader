@@ -97,8 +97,28 @@ enum AppID{
 
 }
 
+enum TagID{
+  sequence(0x30, "SEQUENCE"),
+  integer(0x02, "INTEGER"),
+  objectIdentifier(0x06, "OBJECT IDENTIFIER"),
+  octetString(0x04, "OCTET STRING"),
+  boolean(0x01, "BOOLEAN"),
+  set(0x31, "SET - unordered collection");
 
 
+  factory TagID.fromInt(int tag){
+    for(var t in values){
+      if(t.id == tag){
+        return t;
+      }
+    }
+    throw Exception("Undefined TagID, ${toHex(tag)}");
+  }
+
+  final int id;
+  final String tagName;
+  const TagID(this.id, this.tagName);
+}
 
 enum EfIdGlobal implements IEfID {
   cardAccess(0x1C, [0x01, 0x1C]),

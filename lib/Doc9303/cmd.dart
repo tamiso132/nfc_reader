@@ -8,17 +8,14 @@ part 'interfaces.dart';
 part 'helper.dart';
 part 'efParser.dart';
 part 'encrypt.dart';
+part 'asn1.dart';
 
 
 
 
 class Command{
 
-  static Future<ResponseCommand> readBinary(IsoDepAndroid isoDep, IEfID efID, int offset, int le, {int cla = 0x00}) async{
-
-
-    // TODO, check if app of the ef is selected
-   // await _elementFileSelect(isoDep, efID.getFullID());
+  static Future<ResponseCommand> readBinary(IsoDepAndroid isoDep, IEfID efID,  {int offset = 0x00, int le = 0x00,int cla = 0x00}) async{
 
     return await _readBinaryFullID(isoDep, efID.getFullID(), offset, le);
   }
@@ -84,7 +81,6 @@ class Command{
     if(responseBytes.length >= 2) {
       printUint8List(responseBytes);
       final data = responseBytes.sublist(0, responseBytes.length -2);
-      print("response len: ${responseBytes.length}");
       return ResponseCommand(responseBytes[responseBytes.length - 2], responseBytes[responseBytes.length - 1], data: data);
     }
 
