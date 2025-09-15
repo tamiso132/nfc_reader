@@ -1,6 +1,11 @@
 
 part of 'cmd.dart';
 
+void printUint8List(Uint8List bytes) {
+  final hexString = bytes.map((b) => b.toRadixString(16).padLeft(2, '0')).join(' ');
+  print(hexString);
+}
+
 // TODO, write tests
 class AsnInfo{
   AsnInfo(this.tag, this.data);

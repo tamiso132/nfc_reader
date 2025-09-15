@@ -59,10 +59,12 @@ class NfcExampleState extends State<NfcExample> {
 
         if(nfc!= null) {
 
-          ResponseCommand response=   await Command.readBinary(nfc, EfIdGlobal.cardAccess, 0, 0);
+          ResponseCommand response=  await Command.selectApplication(nfc, AppID.idLSD_1);
+          await Command.readBinary(nfc, EfIdAppSpecific.com, 0, 0);
           if(response.data != null){
-           CardAccessInfo access =  ImplCardAccess().parseFromBytes(response.data!);
-           print("Access Info: {$access.version}");
+            EfComInfo com =  ImplEfCom().parseFromBytes(response.data!);
+
+           print("Access Info: ${  com.ldsVersion}");
           }
 
 

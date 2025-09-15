@@ -315,14 +315,16 @@ class ImplCardAccess implements _IEfParser<CardAccessInfo>{
 
     AsnInfo outerAsn = reader.readASN1();
 
-    if (outerAsn.tag != 0x1C) {
-      throw Exception("Not a valid EF.COM file, expected tag 0x1C but I get 0x${toHex(outerAsn.tag)}");
-    }
+   // if (outerAsn.tag != 0x1C) {
+    //  throw Exception("Not a valid EF.CardAccess file, expected tag 0x1C but I get 0x${toHex(outerAsn.tag)}");
+   // }
 
     int length = outerAsn.data.length;
+    reader = ByteReader(outerAsn.data);
 
     while (reader.hasRemaining()) {
      AsnInfo readASN = reader.readASN1();
+     print("tag: ${readASN.tag}");
 
       switch (readASN.tag) {
         case 0x30: // PaceInfo

@@ -82,6 +82,7 @@ class Command{
     final responseBytes = await isoDep.transceive(cmdRead);
 
     if(responseBytes.length >= 2) {
+      printUint8List(responseBytes);
       final data = responseBytes.sublist(0, responseBytes.length -2);
       print("response len: ${responseBytes.length}");
       return ResponseCommand(responseBytes[responseBytes.length - 2], responseBytes[responseBytes.length - 1], data: data);
