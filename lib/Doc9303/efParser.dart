@@ -12,16 +12,8 @@ part of "cmd.dart";
 
 // They use big endian format,  aka significant byte till least significant
 
-abstract class IEfParser<T>{
-  T parseFromBytes(Uint8List bytes);
-}
-
-
-class ParserDg1{
-
-}
-
-class EfDg1TD1  {
+// TODO, add tags etc and make it associated with a file element
+class Dg1Info{
   int documentCode = 0; // 2 bytes
   int state = 0; // 3 bytes
   Uint8List documentNumber = Uint8List(0); // 9-24 bytes,  use
@@ -31,13 +23,20 @@ class EfDg1TD1  {
   Uint8List nationality = Uint8List(0);
   String name = "";
 
-  EfDg1TD1._();
+  Dg1Info._();
+}
 
-  static EfDg1TD1 parse_from_bytes(Uint8List data){
+class CardAccessInfo{
+
+}
+
+class ImplEfDg1TD1 implements _IEfParser<Dg1Info>{
+  @override
+  Dg1Info parseFromBytes(Uint8List bytes) {
     //TODO, data check, that it is an correct value
-    EfDg1TD1 ef = EfDg1TD1._();
-    ByteReader byteReader = ByteReader(data);
-    
+    Dg1Info ef = Dg1Info._();
+    ByteReader byteReader = ByteReader(bytes);
+
 
 
     ef.documentCode = byteReader.readInt(2);
@@ -46,7 +45,7 @@ class EfDg1TD1  {
     int isExtendedDocument = byteReader.readInt(1);
 
     if(isExtendedDocument == 1){ // if exceeding 9 characters for document number
-     ef.documentNumber.addAll(byteReader.readBytes(15));
+      ef.documentNumber.addAll(byteReader.readBytes(15));
     }
     else{
       byteReader.paddingNext(15);
@@ -66,6 +65,9 @@ class EfDg1TD1  {
     return ef;
   }
 
-
 }
+
+
+
+
 

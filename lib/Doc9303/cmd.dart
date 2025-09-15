@@ -1,12 +1,12 @@
 // Base interface for requests: must provide bytes to send
 
-
 import 'dart:typed_data';
 import 'package:nfc_manager/nfc_manager_android.dart';
 
 part 'types.dart';
-part 'ef_parser.dart';
+part 'interfaces.dart';
 part 'helper.dart';
+part 'efParser.dart';
 
 
 
@@ -31,7 +31,8 @@ class Command{
     Uint8List bytes = _CommandPackage(cla, 0xA4, 0x02, 0x0C, data:fileID).toBytes();
 
     Uint8List response = await isoDep.transceive(bytes);
-
+ int sw1 = response[response.length - 2];
+ int sw2 = response[response.length - 1];
     if (response.length != 2) {
       throw ArgumentError("Invalid response\nresponse length: ${response.length}");
     }

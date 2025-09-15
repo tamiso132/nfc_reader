@@ -96,12 +96,6 @@ enum AppID{
 
 }
 
-abstract class IEfID{
-  int get shortID;
-  Uint8List getFullID();
-
-  AppID? appIdentifier();
-}
 
 
 
