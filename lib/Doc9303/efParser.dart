@@ -301,9 +301,55 @@ class ImplEfDg10TD1 implements _IEfParser<Dg10Info>{
 
 //EF.SOD
 
+class EFSodInfo{
+  String ldsVersion = "";
+  String digestAlgorithm = "";
+  Map<int, Uint8List> dgHashes = {};
+  Uint8List signature = Uint8List(0);
 
+}
 
+class ImplEfSod implements _IEfParser<EFSodInfo> {
+  @override
+  EFSodInfo parseFromBytes(Uint8List bytes) {
+    EFSodInfo ef = EFSodInfo();
+    ByteReader reader = ByteReader(bytes);
 
+    int tag = reader.readInt(1); // bör vara 0x77
+    if (tag != 0x77) {
+      throw Exception("Womp Womp, Not a valid EF.SOD, expected tag 0x77");
+    }
+
+    int length = reader.readLength();
+
+    // Läs version
+    int versionTag = reader.readInt(1); // ex 0x5F01 eller 0x30 beroende på TLV
+    int versionLength = reader.readLength();
+    ef.ldsVersion = String.fromCharCodes(reader.readBytes(versionLength));
+
+    // Läs digest algorithm
+    int digestAlgTag = reader.readInt(1); // ex 0x30 för SEQUENCE
+    int digestAlgLength = reader.readLength();
+    ef.digestAlgorithm = String.fromCharCodes(reader.readBytes(digestAlgLength));
+
+    // Läs DataGroupHashes
+    int dgHashTag = reader.readInt(1); // ex 0x30
+    int dgHashLength = reader.readLength();
+    int dgHashEnd = reader.offset + dgHashLength;
+    while (reader.offset < dgHashEnd) {
+      int dgNumber = reader.readInt(1); // DG1, DG2, ...
+      int hashLen = reader.readLength();
+      ef.dgHashes[dgNumber] = reader.readBytes(hashLen);
+    }
+
+    // Läs signatur
+    int signatureTag = reader.readInt(1); // ex 0x03 eller 0x30 beroende på struktur
+    int signatureLength = reader.readLength();
+    ef.signature = reader.readBytes(signatureLength);
+
+    return ef;
+  }
+}
 
 
 
