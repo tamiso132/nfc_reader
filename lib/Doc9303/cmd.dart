@@ -5,6 +5,8 @@ import 'dart:typed_data';
 import 'package:nfc_manager/nfc_manager_android.dart';
 
 part 'types.dart';
+part 'ef_parser.dart';
+part 'helper.dart';
 
 
 
