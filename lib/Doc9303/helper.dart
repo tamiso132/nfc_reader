@@ -2,6 +2,13 @@
 part of 'cmd.dart';
 
 // TODO, write tests
+class AsnInfo{
+  AsnInfo(this.tag, this.data);
+
+  int tag;
+  Uint8List data;
+}
+
 class ByteReader{
 
   ByteReader(this._data){
@@ -45,6 +52,14 @@ class ByteReader{
     }
     int numBytes = first & 0x7F;
     return readInt(numBytes);
+  }
+
+  AsnInfo readASN1(){
+    int tag = readInt(1);
+    int len = readLength();
+    Uint8List data = readBytes(len);
+
+    return AsnInfo(tag, data);
   }
 
   Uint8List _data;

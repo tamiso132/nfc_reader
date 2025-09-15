@@ -19,6 +19,7 @@ class Command{
 
     // TODO, check if app of the ef is selected
     await _elementFileSelect(isoDep, efID.getFullID());
+
     return await _readBinaryFullID(isoDep, efID.getFullID(), offset, le);
   }
 

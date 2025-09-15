@@ -28,7 +28,6 @@ class KeyEncryption{
     late List<EncryptType> encryptType;
 
     fromObjectIdentifier(String paceProtocol){
-paceProtocol.allMatches(string)
     }
 }
 

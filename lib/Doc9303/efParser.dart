@@ -299,6 +299,68 @@ class ImplEfDg10TD1 implements _IEfParser<Dg10Info>{
 }
 */
 
+
+class CardAccessInfo{
+  String protocol = "";
+  int version = 0;
+  int parameterID = 0;
+}
+
+class ImplCardAccess implements _IEfParser<CardAccessInfo>{
+
+  @override
+  CardAccessInfo parseFromBytes(Uint8List bytes) {
+    CardAccessInfo ef = CardAccessInfo();
+    ByteReader reader = ByteReader(bytes);
+
+    AsnInfo outerAsn = reader.readASN1();
+
+    if (outerAsn.tag != 0x1C) {
+      throw Exception("Not a valid EF.COM file, expected tag 0x1C");
+    }
+
+    int length = outerAsn.data.length;
+
+    while (reader.hasRemaining()) {
+     AsnInfo readASN = reader.readASN1();
+
+      switch (readASN.tag) {
+        case 0x30: // PaceInfo
+
+          ByteReader innerReader = ByteReader(readASN.data);
+          while(innerReader.hasRemaining()){
+            AsnInfo innerAsn = innerReader.readASN1();
+            int count = 0;
+            switch(innerAsn.tag){
+              case 0xA: // identifier
+                ef.protocol = innerReader.readString(innerAsn.data.length);
+                break;
+              default: //
+                if(count == 0){
+                  ef.version = innerReader.readInt(1);
+                  count+= 1;
+                }
+                else{
+                  ef.parameterID = innerReader.readInt(1);
+                }
+                break;
+            }
+          }
+
+
+
+
+          break;
+      }
+    }
+
+    return ef;
+  }
+
+}
+
+// EF.cardaccess
+
 //EF.SOD
 
 
