@@ -14,7 +14,8 @@ part 'helper.dart';
 class Command{
 
   static Future<ResponseCommand> readBinary(IsoDepAndroid isoDep, IEfID efID, int offset, int le, {int cla = 0x00}) async{
-    // TODO, check for error
+
+
     // TODO, check if app of the ef is selected
     await _elementFileSelect(isoDep, efID.getFullID());
     return await _readBinaryFullID(isoDep, efID.getFullID(), offset, le);
