@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:nfc_manager/nfc_manager.dart';
 import 'package:nfc_manager/nfc_manager_android.dart';
-import 'package:test_flutter/Doc9303/apdu.dart';
+
+
+import 'package:test_flutter/Doc9303/cmd.dart';
+
 
 void main() {
  // WidgetsFlutterBinding.ensureInitialized();
@@ -56,14 +59,15 @@ class NfcExampleState extends State<NfcExample> {
 
         if(nfc!= null) {
 
-          ResponseCommand response=   await Command.readBinaryGlobal(nfc, EfIdGlobal.cardAccess, 0, 0);
-          print("resp: 0x${toHex(response.sw1)}${toHex(response.sw2)}");
-          response= await Command.selectLDS1Application(nfc);
-          print("resp: 0x${toHex(response.sw1)}${toHex(response.sw2)}");
+          ResponseCommand response=   await Command.readBinary(nfc, EfIdGlobal.cardAccess, 0, 0);
 
-          response = await Command.readBinaryApp(nfc, EfIdAppSpecific.dg1, 0x00, 255);
+      //    response= await Command.selectLDS1Application(nfc);
+          response = await Command.readBinary(nfc, EfIdGlobal.cardAccess, 0, 255);
+       //   response = await Command.readBinaryApp(nfc, EfIdAppSpecific.dg16, 0, 20);
 
-         print("resp: 0x${toHex(response.sw1)}${toHex(response.sw2)}");
+
+       //   response = await Command.readBinaryApp(nfc, EfIdAppSpecific.dg1, 0x00, 255);
+
 
 
          // var response = await nfc.transceive();
