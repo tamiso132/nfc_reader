@@ -32,6 +32,21 @@ class ByteReader{
     offset += len;
   }
 
+  /// Är det fler bytes kvar?
+  bool hasRemaining() {
+    return offset < _data.length;
+  }
+
+  /// Läs BER/DER length-fält
+  int readLength() {
+    int first = readInt(1);
+    if (first < 0x80) {
+      return first;
+    }
+    int numBytes = first & 0x7F;
+    return readInt(numBytes);
+  }
+
   Uint8List _data;
   late int offset;
 }
