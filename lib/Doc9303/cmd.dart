@@ -18,7 +18,7 @@ class Command{
 
 
     // TODO, check if app of the ef is selected
-    await _elementFileSelect(isoDep, efID.getFullID());
+   // await _elementFileSelect(isoDep, efID.getFullID());
 
     return await _readBinaryFullID(isoDep, efID.getFullID(), offset, le);
   }
@@ -82,9 +82,9 @@ class Command{
     final responseBytes = await isoDep.transceive(cmdRead);
 
     if(responseBytes.length >= 2) {
-      final data = responseBytes.sublist(2);
+      final data = responseBytes.sublist(0, responseBytes.length -2);
       print("response len: ${responseBytes.length}");
-      return ResponseCommand(responseBytes.length - 2, responseBytes.length - 1, data: data);
+      return ResponseCommand(responseBytes[responseBytes.length - 2], responseBytes[responseBytes.length - 1], data: data);
     }
 
     throw ArgumentError("No response was received");
