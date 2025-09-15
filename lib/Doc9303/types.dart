@@ -4,7 +4,8 @@ String toHex(int value, {int width = 2}) {
   return "${value.toRadixString(16).toUpperCase().padLeft(width, '0')}";
 }
 
-enum SwStatus {success(0x90, 0x00, "Command successful."),
+enum SwStatus {
+  success(0x90, 0x00, "Command successful."),
   moreDataAvailable(0x61, -1, "More data available. Use GET RESPONSE."), // SW2 is length
   warningNvMemoryUnchanged(0x62, -1, "Warning (NV memory unchanged)."), // SW2 is specific
   warningNvMemoryChanged(0x63, -1, "Warning (NV memory changed)."),   // SW2 is specific

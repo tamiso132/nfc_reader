@@ -7,6 +7,7 @@ part 'types.dart';
 part 'interfaces.dart';
 part 'helper.dart';
 part 'efParser.dart';
+part 'encrypt.dart';
 
 
 
