@@ -20,6 +20,10 @@ abstract class IEfID{
   AppID? appIdentifier();
 }
 
+
+/*
+Explain what this interface is used for
+ */
 abstract class ICryptoAlgorithm{
   Uint8List encrypt(Uint8List input);
   Uint8List decrypt(Uint8List input);
