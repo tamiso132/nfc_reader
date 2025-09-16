@@ -4,14 +4,14 @@ part of 'cmd.dart';
 
 
 /*
-Explain what this inteface is used for
+Explain what this interface is used for
 */
 abstract class _IEfParser<T>{
   T parseFromBytes(Uint8List bytes);
 }
 
 /*
-Explain what this inteface is used for
+Explain what this interface is used for
  */
 abstract class IEfID{
   int get shortID;
