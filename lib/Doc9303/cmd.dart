@@ -1,6 +1,7 @@
 // Base interface for requests: must provide bytes to send
 
 import 'dart:typed_data';
+import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:nfc_manager/nfc_manager_android.dart';
 import 'package:cryptography/cryptography.dart';
 import 'package:pointycastle/ecc/curves/brainpoolp256r1.dart';

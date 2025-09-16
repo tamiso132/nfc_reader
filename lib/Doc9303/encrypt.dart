@@ -225,3 +225,41 @@ Uint8List _bigIntToFixedSizeBytes(BigInt value, int outputSize){
   }
   return bytes;
 }
+
+// Main ECDH EX
+
+Future<void> performPaceECDH(EncryptionInfo paceParamaterId, Uint8List chipsEphemeralPublicKeyBytes) async{
+  try{
+    print("Starting PACE EDCH w paramater ID: $paceParamaterId");
+
+    final domainParams = getDomainParameter(paceParamaterId);
+    print("domain parameters is: ${domainParams.name}");
+
+    final myKeyPair = generateEcKeyPair(domainParams);
+    final myPublicKey = myKeyPair.publicKey;
+    final myPrivateKey = myKeyPair.privateKey;
+
+    final Uint8List myPublicKeyBytes = myPublicKey.Q!.getEncoded(false);
+    print(" My Ephermal public key (in hex): ${myPublicKeyBytes.map((b) => b.toRadixString(16).padLeft(2, '0')).join('')}");
+    print("   Received Chip's Ephemeral Public Key (hex): ${chipsEphemeralPublicKeyBytes.map((b) => b.toRadixString(16).padLeft(2, '0')).join('')}");
+
+    // Calc shared secret
+    final Uint8List sharedSecret = calculateSharedSecret(domainParams, myPrivateKey, chipsPublicKeyBytes);
+    print("   Calculated Shared Secret (hex): ${sharedSecret.map((b) => b.toRadixString(16).padLeft(2, '0')).join('')}");
+
+  // Derive session keys (Kenc and Kmac) from shared secret using ICAO KDF
+    // "The inspection system is equipped with means to acquire the MRZ from the physical document to derive the
+    // Document Basic Access Keys (KEnc and KMAC) from the eMRTD." ICAO part 11 s54
+  // Mutual authentication, verify chips token
+  // If mutual go to secure messaging
+
+} catch (e, s){
+  print ("Error during PACE ECDH: $e" );
+  print ("Stack trace error: $s");
+  return null;
+
+  // Maybe Rethrow
+}
+}
+
+//TODO SHA-1 Digest Hash function implement
