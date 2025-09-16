@@ -258,7 +258,8 @@ Future<void> performPaceECDH(EncryptionInfo paceParamaterId, Uint8List chipsEphe
     print("Starting PACE EDCH w paramater ID: $paceParamaterId");
 
     final domainParams = getDomainParameter(paceParamaterId);
-    print("domain parameters is: ${domainParams.name}");
+
+    print("domain parameters is: ${domainParams.domainName}");
 
     final myKeyPair = generateEcKeyPair(domainParams);
     final myPublicKey = myKeyPair.publicKey;
@@ -288,3 +289,60 @@ Future<void> performPaceECDH(EncryptionInfo paceParamaterId, Uint8List chipsEphe
 }
 
 //TODO SHA-1 Digest Hash function implement
+
+Uint8List kdfIcaoPace(
+    Uint8List sharedSecretZ,
+    String purpose, // "K_ENC" or "K_MAC" (or other purposes if defined by standard)
+    int keyLengthBytes,
+    Digest hashAlgorithm,
+    ) {
+  if (purpose != "K_ENC" && purpose != "K_MAC") {
+    // You might encounter other "purpose" strings if you implement Chip Authentication (CA) KDFs,
+    // but for PACE session keys, these are the common ones.throw ArgumentError(
+   print('Invalid purpose for PACE KDF. Expected "K_ENC" or K_MAC, got: $purpose');
+  }
+  if (keyLengthBytes <= 0) {
+  throw ArgumentError("Key length must be positive.");
+  }
+
+  // Determine the 4-byte counter based on the purpose
+  Uint8List counterBytes = Uint8List(4);
+  final ByteData counterView = ByteData.view(counterBytes.buffer);
+
+  if (purpose == "K_ENC") {
+  counterView.setUint32(0, 1, Endian.big); // 0x00000001
+  } else { // purpose == "K_MAC"
+  counterView.setUint32(0, 2, Endian.big); // 0x00000002
+  }
+
+  // Prepare the input for the hash function: Z || counter
+  final List<int> kdfInputList = [];
+  kdfInputList.addAll(sharedSecretZ);
+  kdfInputList.addAll(counterBytes);
+  final Uint8List kdfInput = Uint8List.fromList(kdfInputList);
+
+  // Perform the hash
+  hashAlgorithm.reset(); // Ensure the digest is in a clean state
+  hashAlgorithm.update(kdfInput, 0, kdfInput.length);
+
+  Uint8List hashOutput = Uint8List(hashAlgorithm.digestSize);
+  hashAlgorithm.doFinal(hashOutput, 0);
+
+  // Truncate or (if ever needed for some spec) expand the hash output
+  // to the desired keyLengthBytes. For standard PACE, truncation is usually sufficient.
+  if (keyLengthBytes > hashOutput.length) {
+  // This scenario (key longer than hash output) would require multiple rounds of KDF
+  // with an incrementing main counter (not just the 0x01/0x02 suffix).
+  // Standard PACE (e.g., AES-128 with SHA-256) usually doesn't hit this.
+  // ICAO 9303 Part 11, B.5 mentions a KDF for longer keys if needed.
+  // For now, we'll throw if the common case is exceeded, as the simple
+  // Z||counter is usually for when keyLengthBytes <= hashAlgorithm.digestSize
+  throw UnimplementedError(
+  'KDF for keyLengthBytes ($keyLengthBytes) greater than hash output size (${hashOutput.length}) '
+  'requires an iterated KDF not implemented in this basic version. '
+  'Check ICAO 9303 Part 11, Annex B.5 if this is required for your specific PACE parameters.');
+  }
+
+  // Return the (potentially truncated) leftmost bytes of the hash output
+  return hashOutput.sublist(0, keyLengthBytes);
+}

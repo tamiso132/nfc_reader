@@ -91,3 +91,34 @@ class ByteReader{
   Uint8List _data;
   late int offset;
 }
+
+// --- Hex Encoding and Decoding ---
+
+/// Encodes a [Uint8List] into a hexadecimal string.
+String hexEncode(Uint8List bytes) {
+  final buffer = StringBuffer();
+  for (final byte in bytes) {
+    // b.toRadixString(16) might produce "f" for 15. padLeft ensures "0f".
+    buffer.write(byte.toRadixString(16).padLeft(2, '0'));
+  }
+  return buffer.toString();
+}
+
+/// Decodes a hexadecimal string into a [Uint8List].
+
+Uint8List hexDecode(String hexString) {
+  if (hexString.length % 2 != 0) {
+    throw FormatException("Hex string must have an even number of characters.", hexString);
+  }
+
+  final result = Uint8List(hexString.length ~/ 2);
+  for (int i = 0; i < hexString.length; i += 2) {
+    final hexPair = hexString.substring(i, i + 2);
+    final byteValue = int.tryParse(hexPair, radix: 16);
+    if (byteValue == null) {
+      throw FormatException("Invalid hex character found in string.", hexPair, i);
+    }
+    result[i ~/ 2] = byteValue;
+  }
+  return result;
+}
