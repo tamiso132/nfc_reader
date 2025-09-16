@@ -100,6 +100,22 @@ class Command{
     throw ArgumentError("No response was received");
   }
 
+  //TODO Skicka till chippet:
+  //The command MSE:Set AT is used to select and initialize the PACE protocol. The use of MSE:Set AT for PACE is indicated
+  // by a PACE Object Identifier (see Sections 4.4.3 and 9.2.3) contained as cryptographic mechanism reference with tag 0x80,
+  // see table below.
+
+
+  // 0x83 - Reference of a public key / secret key, The password to be used is indicated by the following values in this data
+  // object: 0x01: MRZ_information, 0x02: CAN
+
+  // 0x84 - Reference of a private key / Reference for computing a session key. This data object is REQUIRED to indicate the identifier of the domain
+  // parameters to be used if the domain parameters are ambiguous, i.e.
+  // more than one set of domain parameters is available for PACE.
+
+  // 0x7F4C - Certificate Holder Authorization Template??????
+
+
   static Future<ResponseCommand> _mseSetAT(IsoDepAndroid isoDep, Uint8List oid, Uint8List mrz, Uint8List parameterID, {Uint8List? chat, int cla = 0x00}) async{
 
    Uint8List data = AsnBuilder().addCustomTag(0x80, oid).addCustomTag(0x83, mrz).addCustomTag(0x84, parameterID).build();

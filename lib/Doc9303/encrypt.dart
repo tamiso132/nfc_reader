@@ -162,8 +162,8 @@ enum MacType{
 }
 
 //TODO:
-// Add DH encyption - Diffie Hellman
-// Add ECDH encryption - Diffie Hellman Elliptic curve
+// Add DH encryption - Diffie Hellman
+// Add ECDH encryption - Diffie Hellman Elliptic curve - Almost complete, might need a few more additions and also testing needs to be done
 
 // ECDH
 // 13 - BrainpoolP256r1
@@ -346,3 +346,17 @@ Uint8List kdfIcaoPace(
   // Return the (potentially truncated) leftmost bytes of the hash output
   return hashOutput.sublist(0, keyLengthBytes);
 }
+
+// DH cryptography
+
+class DHParameters
+
+class DHPrivateKey
+
+class DHPrivateKey
+
+class DHKeyPair
+
+class DHKeyGenerator
+
+class DHBasicAgreement
