@@ -270,7 +270,7 @@ Future<void> performPaceECDH(EncryptionInfo paceParamaterId, Uint8List chipsEphe
     print("   Received Chip's Ephemeral Public Key (hex): ${chipsEphemeralPublicKeyBytes.map((b) => b.toRadixString(16).padLeft(2, '0')).join('')}");
 
     // Calc shared secret
-    final Uint8List sharedSecret = calculateSharedSecret(domainParams, myPrivateKey, chipsPublicKeyBytes);
+    final Uint8List sharedSecret = calculateSharedSecret(domainParams, myPrivateKey, chipsEphemeralPublicKeyBytes);
     print("   Calculated Shared Secret (hex): ${sharedSecret.map((b) => b.toRadixString(16).padLeft(2, '0')).join('')}");
 
   // Derive session keys (Kenc and Kmac) from shared secret using ICAO KDF
