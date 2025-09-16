@@ -332,16 +332,21 @@ class ImplCardAccess implements _IEfParser<CardAccessInfo>{
 
   AsnFind allNodes =  AsnNode._parse(ByteReader(bytes));
 
-  for (AsnNode paceInfo in allNodes.filter(TagID.sequence)){
-    final oid = paceInfo.getChildNode(0).getValueAsOID();
-    final ver = paceInfo.getChildNode(1).getValueAsInt();
-    final paramID = paceInfo.getChildNode(2).getValueAsInt();
+  for (AsnNode set in allNodes.filter(TagID.set)){
 
-    EncryptionInfo info = EncryptionInfo.get(oid, paramID);
 
-    print(oid);
-    print(ver);
-    print(paramID);
+    for(AsnNode paceInfo in set.filter(TagID.sequence)) {
+
+
+      final oid = paceInfo.getChildNode(0).getValueAsOID();
+      final ver = paceInfo.getChildNode(1).getValueAsInt();
+      final paramID = paceInfo.getChildNode(2).getValueAsInt();
+
+      //EncryptionInfo info = EncryptionInfo.get(oid, paramID);
+
+      print(toHex(ver));
+      print(toHex(paramID));
+    }
   }
 
     return ef;
