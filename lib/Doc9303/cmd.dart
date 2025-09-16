@@ -6,6 +6,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:nfc_manager/nfc_manager_android.dart';
 import 'package:cryptography/cryptography.dart';
+import 'package:pointycastle/asn1/object_identifiers_database.dart';
 import 'package:pointycastle/ecc/curves/brainpoolp256r1.dart';
 import 'package:pointycastle/ecc/curves/brainpoolp384r1.dart';
 import 'package:pointycastle/export.dart';
@@ -99,7 +100,20 @@ class Command{
     throw ArgumentError("No response was received");
   }
 
-  static Future<ResponseCommand> _mseSetAT(IsoDepAndroid isodep, ,Uint8List oid, Uint8List mrz, int parameterID, Uint8List chat){
+  static Future<ResponseCommand> _mseSetAT(IsoDepAndroid isoDep, Uint8List oid, Uint8List mrz, Uint8List parameterID, {Uint8List? chat, int cla = 0x00}) async{
+
+   Uint8List data = AsnBuilder().addCustomTag(0x80, oid).addCustomTag(0x83, mrz).addCustomTag(0x84, parameterID).build();
+
+  Uint8List cmdRead  =_CommandPackage(cla, 0x22, 0xC1, 0xA4, data: data).toBytes();
+  final responseBytes = await isoDep.transceive(cmdRead);
+
+  if(responseBytes.length >= 2) {
+    printUint8List(responseBytes);
+    final data = responseBytes.sublist(0, responseBytes.length -2);
+    return ResponseCommand(responseBytes[responseBytes.length - 2], responseBytes[responseBytes.length - 1], data: data);
+  }
+
+  throw ArgumentError("No response was received");
 
   }
 

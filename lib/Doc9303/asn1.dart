@@ -3,6 +3,28 @@ part of 'cmd.dart';
 // omg there is a protocol for OID
 
 
+class AsnBuilder{
+  AsnBuilder addCustomTag(int tag, Uint8List packetData){
+    Uint8List packet = Uint8List.fromList([tag & 0xFF,packetData.length];
+    packet.addAll(packetData);
+
+    _data.addAll(packet);
+
+    return this;
+  }
+
+  AsnBuilder addTag(TagID tag, Uint8List packetData){
+    return addCustomTag(tag.id, packetData);
+  }
+
+  Uint8List build(){
+    return Uint8List.fromList(_data);
+  }
+
+
+  final List<int> _data = [];
+}
+
 class AsnFind{
   AsnFind(this._topLevelNodes);
 
