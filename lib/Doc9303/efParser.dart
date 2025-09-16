@@ -342,10 +342,10 @@ class ImplCardAccess implements _IEfParser<CardAccessInfo>{
       final ver = paceInfo.getChildNode(1).getValueAsInt();
       final paramID = paceInfo.getChildNode(2).getValueAsInt();
 
-      //EncryptionInfo info = EncryptionInfo.get(oid, paramID);
+      EncryptionInfo info = EncryptionInfo.get(oid, paramID);
+      info.printInfo();
 
-      print(toHex(ver));
-      print(toHex(paramID));
+
     }
   }
 

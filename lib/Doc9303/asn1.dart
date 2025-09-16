@@ -49,15 +49,14 @@ class AsnNode {
      throw Exception("Accessing non existing child node");
   }
 
-  String getValueAsOID(){
-     return String.fromCharCodes(value!);
+  List<int> getValueAsOID(){
+     return value!;
   }
 
-  // Big endian implementation, might be little endian. dunno
+  // Big endian implementation, might need to be little endian. dunno
   int getValueAsInt(){
      int ret = 0;
      for(int i = 0; i < value!.length; i++){
-       print("avg: ${value![i]}");
         ret |= value![i] << (8 * (value!.length - 1 - i));
      }
      return ret;

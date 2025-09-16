@@ -31,10 +31,13 @@ class EncryptionInfo{
     4: (CipherEncryption.aes, MacType.cMac, 256),
   };
 
-  static EncryptionInfo get(String oid, int parameterID){
-    final list = oid.split('.');
-    final lastID = int.parse(list[list.length - 1]);
-    final paceID = int.parse(list[list.length - 2]);
+
+
+  static EncryptionInfo get(List<int> oid, int parameterID){
+
+// TODO, validate the oid maybe
+    final lastID = oid[oid.length - 1];
+    final paceID = oid[oid.length - 2];
 
 
 
@@ -66,6 +69,16 @@ class EncryptionInfo{
     }
 
     return info;
+  }
+
+  void printInfo(){
+    print("");
+    print("${agreementType.name}");
+    print("${encryptType.name}");
+    print("${mappingType.name}");
+    print("${macType.name}");
+    print("");
+
   }
 
   KeyAgreement agreementType = KeyAgreement.unknown;
@@ -108,32 +121,44 @@ List<String> _splitOnId(String input) {
 
 
 enum Mapping{
-  im,
-  gm,
-  cam,
-  unknown,
+  im("Integrated Mapping"),
+  gm("Generic Mapping"),
+  cam("Cam"),
+  unknown("Unknown");
+
+  final String name;
+  const Mapping(this.name);
 }
 
 // TODO, function that depends on KeyAgreementType
 enum KeyAgreement
 {
-  dh, // diffie-hellman
-  ecDh, // eclipse curve diffe hellman
-  unknown,
+  dh("DH"), // diffie-hellman
+  ecDh("ECDH"), // eclipse curve diffe hellman
+  unknown("Unknown");
+
+  final String name;
+  const KeyAgreement(this.name);
 }
 
 // TODO, function that depends on ciper encryption type
 enum CipherEncryption
 {
-  aes,
-  e3des,
-  unknown,
+  aes("AES"),
+  e3des("3DES"),
+  unknown("Unknown");
+
+  final String name;
+  const CipherEncryption(this.name);
 }
 // TODO, function that depends on mac type
 enum MacType{
-  cbc, // cbc-mac algoritm
-  cMac, // CMac
-  unknown,
+  cbc("CBC"), // cbc-mac algoritm
+  cMac("CMAC"), // CMac
+  unknown("Unknown");
+
+  final String name;
+  const MacType(this.name);
 }
 
 //TODO:
