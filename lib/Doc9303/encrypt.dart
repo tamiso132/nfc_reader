@@ -267,7 +267,7 @@ Future<void> performPaceECDH(EncryptionInfo paceParamaterId, Uint8List chipsEphe
 
     final Uint8List myPublicKeyBytes = myPublicKey.Q!.getEncoded(false);
     print(" My Ephermal public key (in hex): ${myPublicKeyBytes.map((b) => b.toRadixString(16).padLeft(2, '0')).join('')}");
-    print("   Received Chip's Ephemeral Public Key (hex): ${chipsEphemeralPublicKeyBytes.map((b) => b.toRadixString(16).padLeft(2, '0')).join('')}");
+    print(" Received Chip's Ephemeral Public Key (hex): ${chipsEphemeralPublicKeyBytes.map((b) => b.toRadixString(16).padLeft(2, '0')).join('')}");
 
     // Calc shared secret
     final Uint8List sharedSecret = calculateSharedSecret(domainParams, myPrivateKey, chipsEphemeralPublicKeyBytes);
