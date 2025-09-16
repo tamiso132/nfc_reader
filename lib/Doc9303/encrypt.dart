@@ -141,24 +141,84 @@ enum MacType{
 // 13 - BrainpoolP256r1
 // 16 - BrainpoolP384r1
 
-ECDomainParameters getDomainParameter(int parameterId){
-  if (parameterId == 13) {
-    print("Using: Brainpool P256r1 for parameterID = $parameterId");
-    return ECCurve_brainpoolp256r1();
-  } else if (parameterId == 16){
-    print("Using: Brainpool P384r1 for parameterID = $parameterId");
-    return ECCurve_brainpoolp384r1();
-  } else {
-    throw ArgumentError("PACE ID not supported ($parameterId");
+ECDomainParameters getDomainParameter(EncryptionInfo parameterId) {
+  switch (parameterId.algoIdent!.type) {
+    case AlgorithmType.brainPool:
+      if (parameterId.algoIdent!.bitLength == 256) {
+        print("Using: Brainpool P256r1 for parameterID = $parameterId");
+        return ECCurve_brainpoolp256r1();
+      } else if (parameterId.algoIdent!.bitLength == 384) {
+        print("Using: Brainpool P384r1 for parameterID = $parameterId");
+        return ECCurve_brainpoolp384r1();
+      } else {
+        throw ArgumentError("PACE ID not supported ($parameterId");
+      }
 
+      // TODO: Handle this case.
+      throw UnimplementedError();
+    case AlgorithmType.nist:
+    // TODO: Handle this case.
+      throw UnimplementedError('Not work :(');
+    case AlgorithmType.modPrime:
+    // TODO: Handle this case.
+      throw UnimplementedError('Not work :(');
   }
 }
 
-// Ephermal ECDH key pair
 
+// Ephermal ECDH key pair generate
 AsymmetricKeyPair<ECPublicKey, ECPrivateKey> generateEcKeyPair(ECDomainParameters domainParams){
-  final SecureRandom = FortunaRandom();
-  final random = SecureRandom();
-  final seed = Uint8List.fromList(List<int>.generate(32, (_) -> random.nextInt(256)));
+  final SecureRandom = FortunaRandom(); // Crypto secure random numbers
+  final random = Random.secure();
+  final seed = Uint8List.fromList(List<int>.generate(32, (_) => random.nextInt(256)));
+  SecureRandom.seed(KeyParameter(seed));
 
+  final keyParams = ECKeyGeneratorParameters(domainParams);
+  final generator = ECKeyGenerator();
+  generator.init(ParametersWithRandom(keyParams, SecureRandom));
+
+  return generator.generateKeyPair();
+
+}
+
+// ECDH Key agreement
+Uint8List calculateSharedSecret(
+ECDomainParameters domainParams, ECPrivateKey myPrivateKey,
+Uint8List chipsPublicKeyBytes){
+
+  ECPoint? chipsPublicPoint = domainParams.curve.decodePoint(chipsPublicKeyBytes);
+  if(chipsPublicPoint == null){
+    throw ArgumentError('Failed to decode public key, please come again');
+  }
+  final chipsPublicKey = ECPublicKey(chipsPublicPoint, domainParams);
+
+  //Agreement initialize
+  final agreement = ECDHBasicAgreement();
+  agreement.init(myPrivateKey);
+
+  final BigInt sharedSecretBigInt = agreement.calculateAgreement(chipsPublicKey);
+  // Convert big int shared secret into a byte array which is a fixed size depending on field size (32 byte for 256-bit curve
+  final int keySizeInBytes = (domainParams.curve.fieldSize + 7) ~/ 8; // 256 -> 32 and 384 -> 48
+  final Uint8List sharedSecretBytes = _bigIntToFixedSizeBytes(sharedSecretBigInt,keySizeInBytes);
+  return sharedSecretBytes;
+}
+
+Uint8List _bigIntToFixedSizeBytes(BigInt value, int outputSize){
+  Uint8List bytes = Uint8List(outputSize);
+
+  String hex = value.toRadixString(16);
+  if (hex.length % 2 != 0){
+  hex = '0' + hex;
+  }
+  if (hex.length / 2 > outputSize){
+    print("Womp womp: BigInt hex representation is larger than output size");
+
+  } else if (hex.length / 2 < outputSize){
+    hex = hex.padLeft(outputSize * 2, '0');
+  }
+  for (int i = 0; i > outputSize; i++){
+    bytes[i] = int.parse(hex.substring(i * 2, i * 2 + 2), radix: 16);
+
+  }
+  return bytes;
 }
