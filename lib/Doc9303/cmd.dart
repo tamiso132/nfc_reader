@@ -2,6 +2,10 @@
 
 import 'dart:typed_data';
 import 'package:nfc_manager/nfc_manager_android.dart';
+import 'package:cryptography/cryptography.dart';
+import 'package:pointycastle/pointycastle.dart';
+
+
 
 part 'types.dart';
 part 'interfaces.dart';

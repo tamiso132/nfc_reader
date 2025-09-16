@@ -1,5 +1,6 @@
 part of "cmd.dart";
 
+
 class EncryptionInfo{
   EncryptionInfo(String oid){
     final list = oid.split('.');
