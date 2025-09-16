@@ -41,14 +41,18 @@ class EncryptionInfo{
 
 
 
+
     EncryptionInfo info = EncryptionInfo();
+
+    info.orgOID = oid;
+    info.orgParameterID = parameterID;
 
     info.agreementType = _paceMap[paceID]!.$1;
     info.mappingType = _paceMap[paceID]!.$2;
 
-    info.encryptType = _cryptoMap[paceID]!.$1;
-    info.macType = _cryptoMap[paceID]!.$2;
-    info.len = _cryptoMap[paceID]!.$3;
+    info.encryptType = _cryptoMap[lastID]!.$1;
+    info.macType = _cryptoMap[lastID]!.$2;
+    info.len = _cryptoMap[lastID]!.$3;
 
     switch(parameterID){
 
@@ -87,6 +91,8 @@ class EncryptionInfo{
   MacType macType = MacType.unknown;
   AlgorithmIdentifier? algoIdent = null;
   int len = 0;
+  List<int> orgOID = [];
+  int orgParameterID = 0;
 
 
 

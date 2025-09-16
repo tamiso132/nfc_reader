@@ -1,6 +1,11 @@
+
+import 'dart:typed_data';
+
+import 'package:cryptography/cryptography.dart';
 import 'package:flutter/material.dart';
 import 'package:nfc_manager/nfc_manager.dart';
 import 'package:nfc_manager/nfc_manager_android.dart';
+import 'package:pointycastle/digests/sha1.dart';
 
 
 import 'package:test_flutter/Doc9303/cmd.dart';
@@ -58,12 +63,18 @@ class NfcExampleState extends State<NfcExample> {
 
         if(nfc!= null) {
 
-          ResponseCommand response = await Command.readBinary(nfc, EfIdGlobal.cardSecurity);
-         printUint8List(response.data!);
+          ResponseCommand response = await Command.readBinary(nfc, EfIdGlobal.cardAccess);
+
        //    response=  await Command.readBinary(nfc, EfIdGlobal.cardAccess);
           if(response.data != null){
-           // final parsed =  ImplCardAccess().parseFromBytes(response.data!);
+            final parsed =  ImplCardAccess().parseFromBytes(response.data!);
 
+            Uint8List oid =  Uint8List.fromList(parsed.encryptInfos[0].orgOID);
+            final mrz = getMrz("94651334", "970319", "230511");
+            final dd = Uint8List.fromList(mrz.codeUnits);
+            final password = SHA1Digest().process(dd);
+
+            response = await Command.mseSetAT(nfc,oid, password, parsed.encryptInfos[0].orgParameterID);
          //  print("Access Info: ${  parsed.version}");
           }
 

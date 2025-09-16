@@ -5,7 +5,7 @@ part of 'cmd.dart';
 
 class AsnBuilder{
   AsnBuilder addCustomTag(int tag, Uint8List packetData){
-    Uint8List packet = Uint8List.fromList([tag & 0xFF,packetData.length];
+      List<int> packet = ([tag & 0xFF ,packetData.length]);
     packet.addAll(packetData);
 
     _data.addAll(packet);
@@ -22,7 +22,7 @@ class AsnBuilder{
   }
 
 
-  final List<int> _data = [];
+  final Uint8List _data = Uint8List(0);
 }
 
 class AsnFind{

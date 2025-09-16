@@ -306,9 +306,7 @@ class ImplEfDg10TD1 implements _IEfParser<Dg10Info>{
 
 
 class CardAccessInfo{
-  String protocol = "";
-  int version = 0;
-  int parameterID = 0;
+  List<EncryptionInfo> encryptInfos = [];
 }
 
 class ImplCardAccess implements _IEfParser<CardAccessInfo>{
@@ -325,8 +323,20 @@ class ImplCardAccess implements _IEfParser<CardAccessInfo>{
    // }
 
 
-    reader = ByteReader(bytes);
-    AsnNode node;
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -343,6 +353,7 @@ class ImplCardAccess implements _IEfParser<CardAccessInfo>{
       final paramID = paceInfo.getChildNode(2).getValueAsInt();
 
       EncryptionInfo info = EncryptionInfo.get(oid, paramID);
+      ef.encryptInfos.add(info);
 
 
 
