@@ -2,6 +2,7 @@
 
 import 'dart:convert';
 import 'dart:typed_data';
+import 'package:flutter/cupertino.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:nfc_manager/nfc_manager_android.dart';
 import 'package:cryptography/cryptography.dart';
@@ -96,6 +97,10 @@ class Command{
     }
 
     throw ArgumentError("No response was received");
+  }
+
+  static Future<ResponseCommand> _mseSetAT(IsoDepAndroid isodep, ,Uint8List oid, Uint8List mrz, int parameterID, Uint8List chat){
+
   }
 
   // if we selected an application

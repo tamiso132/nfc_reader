@@ -344,8 +344,6 @@ class ImplCardAccess implements _IEfParser<CardAccessInfo>{
 
       EncryptionInfo info = EncryptionInfo.get(oid, paramID);
       info.printInfo();
-
-
     }
   }
 
