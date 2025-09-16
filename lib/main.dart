@@ -46,8 +46,7 @@ class NfcExampleState extends State<NfcExample> {
 
 
   void _startNfcSession() async{
-    print("Start Session");
-
+    print("${getMrz("94651334", "970319", "230511")}");
     //Mrzflutterplugin.startContinuousScanner(testCallback);
 
     await NfcManager.instance.startSession(
@@ -59,11 +58,13 @@ class NfcExampleState extends State<NfcExample> {
 
         if(nfc!= null) {
 
-          ResponseCommand response=  await Command.readBinary(nfc, EfIdGlobal.cardAccess);
+          ResponseCommand response = await Command.readBinary(nfc, EfIdGlobal.cardSecurity);
+         printUint8List(response.data!);
+       //    response=  await Command.readBinary(nfc, EfIdGlobal.cardAccess);
           if(response.data != null){
-            final parsed =  ImplCardAccess().parseFromBytes(response.data!);
+           // final parsed =  ImplCardAccess().parseFromBytes(response.data!);
 
-           print("Access Info: ${  parsed.version}");
+         //  print("Access Info: ${  parsed.version}");
           }
 
 

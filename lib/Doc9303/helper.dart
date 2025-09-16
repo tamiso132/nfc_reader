@@ -1,6 +1,49 @@
 
 part of 'cmd.dart';
 
+// FORMAT,  birth/Expire: YYMMDD
+String getMrz(String docNr, String birth, String dateExpire){
+  while(docNr.length < 9){
+    docNr += "<";
+  }
+
+  String fullStr = "";
+  fullStr += docNr + getCheckDigit(docNr);
+  fullStr += getCheckDigit(docNr);
+  fullStr += birth + getCheckDigit(birth);
+  fullStr += dateExpire + getCheckDigit(dateExpire);
+
+  return fullStr;
+}
+
+String getCheckDigit(String s){
+
+  List<int> lookupWeight = [7, 3, 1];
+  int lookupIndex = 0;
+  int sum = 0;
+  for(final c in s.toLowerCase().characters){
+  int asciCode = c.codeUnitAt(0);
+
+   if(asciCode >= 48 && asciCode <= 57){ // 0-9
+     sum += int.parse(c) * lookupWeight[lookupIndex];
+   }
+   else if(asciCode >= 97 && asciCode <= 122) {// a-z{
+     sum += (asciCode - 87) * lookupWeight[lookupIndex];
+
+   }
+   else if(c != '<'){
+      throw Exception("Illegal character for check digit");
+   }
+
+
+    lookupIndex += 1;
+    lookupIndex %= 3;
+  }
+
+  return (sum % 10).toString();
+
+}
+
 void printUint8List(Uint8List bytes) {
   final hexString = bytes.map((b) => b.toRadixString(16).padLeft(2, '0')).join(' ');
   print(hexString);

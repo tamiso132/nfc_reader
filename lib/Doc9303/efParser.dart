@@ -351,8 +351,6 @@ class ImplCardAccess implements _IEfParser<CardAccessInfo>{
       _compareByteLists;
 
       info.printInfo();
-
-
     }
   }
 
