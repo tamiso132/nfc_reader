@@ -324,13 +324,21 @@ class ImplCardAccess implements _IEfParser<CardAccessInfo>{
     //  throw Exception("Not a valid EF.CardAccess file, expected tag 0x1C but I get 0x${toHex(outerAsn.tag)}");
    // }
 
+
     reader = ByteReader(bytes);
+    AsnNode node;
 
-  List<AsnNode> nodes =  AsnNode.parse(reader);
-  for(AsnNode node in nodes){
-    node.printTree();
+
+
+  AsnFind allNodes =  AsnNode._parse(ByteReader(bytes));
+
+  for (AsnNode paceInfo in allNodes.filter(TagID.sequence)){
+    final oid = paceInfo.getChildNode(0).getValueAsOID();
+    final ver = paceInfo.getChildNode(1).getValueAsInt();
+    final paramID = paceInfo.getChildNode(2).getValueAsInt();
+
+    EncryptionInfo info = EncryptionInfo.get(oid, paramID);
   }
-
 
     return ef;
   }

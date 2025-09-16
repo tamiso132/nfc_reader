@@ -1,26 +1,71 @@
 part of 'cmd.dart';
 
 // omg there is a protocol for OID
-class AsnTree{
-  AsnTree(TagID id, Uint8List bytes) :
-        nodes =AsnNode(id),
-        reader = ByteReader(bytes);
 
-  AsnNode nodes;
-  ByteReader reader;
-  
-  
+
+class AsnFind{
+  AsnFind(this._topLevelNodes);
+
+  List<AsnNode> filter(TagID id){
+    List<AsnNode> matched = [];
+
+    for(AsnNode node in _topLevelNodes){
+      if(node.tag == id){
+        matched.add(node);
+      }
+    }
+    return matched;
+  }
+  List<AsnNode> getAllNodes(){
+    return _topLevelNodes;
+  }
+
+  final List<AsnNode> _topLevelNodes;
 }
 
 class AsnNode {
   final TagID tag;
   final Uint8List? value;
-  final List<AsnNode>? children;
+  final List<AsnNode> children;
 
-  AsnNode(this.tag, {this.value, this.children});
+  AsnNode(this.tag, {this.value, List<AsnNode>? children}) : children = children ?? [];
 
-  // Parses a single ASN.1 element from the reader
-  static List<AsnNode> parse(ByteReader reader)
+   List<AsnNode> filter(TagID id){
+     List<AsnNode> matched= [];
+    for(AsnNode child in children){
+      if(child.tag == id){
+        matched.add(child);
+      }
+    }
+    return matched;
+
+  }
+
+  AsnNode getChildNode(int i){
+     if(children.length < i){
+       return children[i];
+     }
+     throw Exception("Accessing non existing child node");
+  }
+
+  String getValueAsOID(){
+     return String.fromCharCodes(value!);
+  }
+
+  // Big endian implementation, might be little endian. dunno
+  int getValueAsInt(){
+     int ret = 0;
+     for(int i = 0; i < value!.length; i++){
+        ret |= value![0] << (8 * value!.length - 1 - i);
+     }
+     return ret;
+  }
+
+
+
+
+
+  static AsnFind _parse(ByteReader reader)
   {
     List<AsnNode> nodes = [];
     while (reader.hasRemaining()) {
@@ -34,7 +79,7 @@ class AsnNode {
         List<AsnNode> children = [];
 
         while (innerReader.hasRemaining()) {
-          children.addAll(AsnNode.parse(innerReader));
+          children.addAll(AsnNode._parse(innerReader).getAllNodes());
         }
 
         nodes.add(AsnNode(tag, children: children));
@@ -43,14 +88,14 @@ class AsnNode {
         nodes.add(AsnNode(tag, value: asnInfo.data));
       }
     }
-    return nodes;
+    return AsnFind(nodes);
   }
 
   void printTree([int indent = 0]) {
     final prefix = '  ' * indent;
-    if (children != null && children!.isNotEmpty) {
+    if (children.isNotEmpty) {
       print('$prefix${tag.tagName} (constructed)');
-      for (var child in children!) {
+      for (var child in children) {
         child.printTree(indent + 1);
       }
     } else if(value != null) {

@@ -31,7 +31,7 @@ class EncryptionInfo{
     4: (CipherEncryption.aes, MacType.cMac, 256),
   };
 
-  static void get(String oid, int parameterID){
+  static EncryptionInfo get(String oid, int parameterID){
     final list = oid.split('.');
     final lastID = int.parse(list[list.length - 1]);
     final paceID = int.parse(list[list.length - 2]);
@@ -65,6 +65,7 @@ class EncryptionInfo{
       throw Exception("Invalid configuration: MacType is unknown");
     }
 
+    return info;
   }
 
   KeyAgreement agreementType = KeyAgreement.unknown;
@@ -73,6 +74,8 @@ class EncryptionInfo{
   MacType macType = MacType.unknown;
   AlgorithmIdentifier? algoIdent = null;
   int len = 0;
+
+
 
 }
 
@@ -130,7 +133,7 @@ enum CipherEncryption
 enum MacType{
   cbc, // cbc-mac algoritm
   cMac, // CMac
-
+  unknown,
 }
 
 //TODO:
