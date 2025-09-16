@@ -1,6 +1,17 @@
 part of 'cmd.dart';
 
 // omg there is a protocol for OID
+class AsnTree{
+  AsnTree(TagID id, Uint8List bytes) :
+        nodes =AsnNode(id),
+        reader = ByteReader(bytes);
+
+  AsnNode nodes;
+  ByteReader reader;
+  
+  
+}
+
 class AsnNode {
   final TagID tag;
   final Uint8List? value;

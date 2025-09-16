@@ -1,5 +1,18 @@
 part of "cmd.dart";
 
+class EncryptionInfo{
+  EncryptionInfo(String oid){
+    final list = oid.split('.');
+    final last_number = list[list.length - 1];
+    final second_last = list[list.length - 2];
+  }
+  KeyAgreement agreementType;
+  CipherEncryption encryptType;
+  MacType macType;
+  EncryptLength len;
+
+}
+
 List<String> _splitOnId(String input) {
   List<String> results = [];
   int index = 0;
@@ -22,19 +35,9 @@ List<String> _splitOnId(String input) {
 
   return results;
 }
+// 9
+// sista nummer också
 
-class KeyEncryption{
-    late KeyAgreement agreementType;
-    late List<EncryptType> encryptType;
-
-    fromObjectIdentifier(String paceProtocol){
-    }
-}
-
-class EncryptType{
-  late CipherEncryption cipherEncrypt;
-  late List<MacType> macType;
-}
 
 enum EncryptLength{
   len128,

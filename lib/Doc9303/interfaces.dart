@@ -19,3 +19,10 @@ abstract class IEfID{
 
   AppID? appIdentifier();
 }
+
+abstract class ICryptoAlgorithm{
+  Uint8List encrypt(Uint8List input);
+  Uint8List decrypt(Uint8List input);
+}
+
+
