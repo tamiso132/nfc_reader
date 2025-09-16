@@ -3,8 +3,11 @@
 import 'dart:typed_data';
 import 'package:nfc_manager/nfc_manager_android.dart';
 import 'package:cryptography/cryptography.dart';
+import 'package:pointycastle/ecc/curves/brainpoolp256r1.dart';
+import 'package:pointycastle/ecc/curves/brainpoolp384r1.dart';
+import 'package:pointycastle/export.dart';
 import 'package:pointycastle/pointycastle.dart';
-
+import 'dart:math';
 
 
 part 'types.dart';

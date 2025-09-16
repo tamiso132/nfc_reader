@@ -65,3 +65,32 @@ enum MacType{
   cbc, // cbc-mac algoritm
   cMac, // CMac
 }
+
+//TODO:
+// Add DH encyption - Diffie Hellman
+// Add ECDH encryption - Diffie Hellman Elliptic curve
+
+// ECDH
+// 13 - BrainpoolP256r1
+// 16 - BrainpoolP384r1
+
+ECDomainParameters getDomainParameter(int parameterId){
+  if (parameterId == 13) {
+    print("Using: Brainpool P256r1 for parameterID = $parameterId");
+    return ECCurve_brainpoolp256r1();
+  } else if (parameterId == 16){
+    print("Using: Brainpool P384r1 for parameterID = $parameterId");
+    return ECCurve_brainpoolp384r1();
+  } else {
+    throw ArgumentError("PACE ID not supported ($parameterId");
+
+  }
+}
+
+// Ephermal ECDH key pair
+
+AsymmetricKeyPair<ECPublicKey, ECPrivateKey> generateEcKeyPair(ECDomainParameters domainParams){
+  final SecureRandom = FortunaRandom();
+  final random = SecureRandom();
+  final seed = Uint8List.fromList(List<int>.generate(32, (_) -> random.nextInt(256)));
+}
