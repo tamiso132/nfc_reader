@@ -10,6 +10,7 @@ class AsnFind{
     List<AsnNode> matched = [];
 
     for(AsnNode node in _topLevelNodes){
+
       if(node.tag == id){
         matched.add(node);
       }
@@ -42,21 +43,21 @@ class AsnNode {
   }
 
   AsnNode getChildNode(int i){
-     if(children.length < i){
+     if(children.length > i){
        return children[i];
      }
      throw Exception("Accessing non existing child node");
   }
 
-  String getValueAsOID(){
-     return String.fromCharCodes(value!);
+  List<int> getValueAsOID(){
+     return value!;
   }
 
-  // Big endian implementation, might be little endian. dunno
+  // Big endian implementation, might need to be little endian. dunno
   int getValueAsInt(){
      int ret = 0;
      for(int i = 0; i < value!.length; i++){
-        ret |= value![0] << (8 * value!.length - 1 - i);
+        ret |= value![i] << (8 * (value!.length - 1 - i));
      }
      return ret;
   }
@@ -74,7 +75,6 @@ class AsnNode {
       TagID tag = asnInfo.tag;
 
       if (tag == TagID.sequence || tag == TagID.set) {
-
         ByteReader innerReader = ByteReader(asnInfo.data);
         List<AsnNode> children = [];
 
@@ -88,6 +88,7 @@ class AsnNode {
         nodes.add(AsnNode(tag, value: asnInfo.data));
       }
     }
+
     return AsnFind(nodes);
   }
 

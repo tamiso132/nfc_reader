@@ -1,5 +1,6 @@
 // Base interface for requests: must provide bytes to send
 
+import 'dart:convert';
 import 'dart:typed_data';
 import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:nfc_manager/nfc_manager_android.dart';
