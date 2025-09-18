@@ -31,9 +31,7 @@ dependencies:
   flutter:
     sdk: flutter
   nfc_manager: 4.0.2
-  freezed_annotation: 3.1.0
-  cryptography: 2.7.0
-  pointycastle: 4.0.0
+  web_socket_channel: ^2.3.0
 
 
   # The following adds the Cupertino Icons font to your application.
