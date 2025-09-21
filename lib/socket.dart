@@ -34,21 +34,22 @@ class NfcWebSocketBridge {
       _stream = _channel.stream.listen(
             (message) async {
           if (_isoDep != null) {
-            try {
-              Uint8List rawBytes = Uint8List.fromList(message);
-              CommandPacket cmd = CommandPacket.tryFromBytes(rawBytes);
+            Uint8List rawBytes = Uint8List.fromList(message);
+            CommandPacket cmd = CommandPacket.tryFromBytes(rawBytes);
 
+            try {
               logFunc("Sent to NFC: ${toHexString(cmd.Data())}", LogType.info);
               Uint8List response = await _isoDep!.transceive(cmd.Data());
               logFunc("Response from NFC: ${toHexString(response)}", LogType.info);
 
-              // Send NFC response back to WebSocket
-              _channel.sink.add(CommandPacket(CommandType.Package, response.length, response).ToBytes());
+              _sendToServer(CommandPacket(CommandType.Package, response.length, response));
             } catch (e) {
-              logFunc("Error communicating with NFC or Server: $e", LogType.error);
+              logFunc("Error communicating with NFC: $e", LogType.error);
+              _notifyServerError("NFC communication failed: $e");
             }
-          } else {
-            logFunc("NFC Disconnected in the middle of EPass Validation", LogType.error);
+          }
+          else{
+            logFunc("NFC Communication is Closed", LogType.error);
           }
         },
         onDone: () {
@@ -56,10 +57,11 @@ class NfcWebSocketBridge {
           isConnected = false;
         },
         onError: (error) {
-          logFunc('WebSocket error: $error', LogType.info);
+          logFunc('WebSocket error: $error', LogType.error);
           isConnected = false;
         },
       );
+
 
       isConnected = true; // mark connection established
     } catch (e) {
@@ -92,6 +94,19 @@ class NfcWebSocketBridge {
 
       },   pollingOptions: {NfcPollingOption.iso14443},
     );
+  }
+
+  void _sendToServer(CommandPacket packet) {
+    try {
+      _channel.sink.add(packet.ToBytes());
+    } catch (e) {
+      logFunc("Error sending to Server: $e", LogType.error);
+    }
+  }
+
+  void _notifyServerError(String message) {
+      Uint8List errorPayload = Uint8List.fromList(utf8.encode(message));
+      _sendToServer(CommandPacket(CommandType.NFCLost, errorPayload.length, errorPayload));
   }
 
 
